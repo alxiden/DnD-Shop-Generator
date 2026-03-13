@@ -52,17 +52,21 @@ export function priceToCp(item) {
 
 export function cpToPrice(cpValue) {
   const safeCp = Math.max(0, Math.round(cpValue));
-  const denominations = ["pp", "gp", "sp", "cp"];
 
-  for (const denomination of denominations) {
-    const unit = DENOMINATION_TO_CP[denomination];
-    if (safeCp >= unit) {
-      const value = Number((safeCp / unit).toFixed(2));
-      return { value, denomination };
-    }
+  // Items worth at least 1 gp display in whole GP.
+  if (safeCp >= DENOMINATION_TO_CP.gp) {
+    const gp = Math.round(safeCp / DENOMINATION_TO_CP.gp);
+    return { value: gp, denomination: "gp" };
   }
 
-  return { value: 0, denomination: "cp" };
+  // Items worth at least 1 sp display in whole SP.
+  if (safeCp >= DENOMINATION_TO_CP.sp) {
+    const sp = Math.round(safeCp / DENOMINATION_TO_CP.sp);
+    return { value: sp, denomination: "sp" };
+  }
+
+  // Copper-only items keep their exact cp value.
+  return { value: Math.max(1, safeCp), denomination: "cp" };
 }
 
 export function formatPrice(price) {
@@ -70,10 +74,17 @@ export function formatPrice(price) {
 }
 
 export function applyPriceModifiers(baseCp, { settlement, quality }) {
+  // Copper-only items (< 1 sp) are priced as-is — modifiers aren't meaningful at this scale.
+  if (baseCp < DENOMINATION_TO_CP.sp) return baseCp;
+
   const settlementMod = SETTLEMENT_MODIFIERS[settlement] ?? 1.0;
   const qualityMod = QUALITY_MODIFIERS[quality] ?? 1.0;
   const adjusted = baseCp * settlementMod * qualityMod;
 
-  // Round to nearest 5cp so prices are table-friendly.
-  return Math.max(1, Math.round(adjusted / 5) * 5);
+  // Round to nearest whole GP (100cp) above 1 gp; keep sub-GP values intact for SP display.
+  if (adjusted >= DENOMINATION_TO_CP.gp) {
+    return Math.round(adjusted / 100) * 100;
+  }
+  // Sub-GP: round to nearest SP (10cp).
+  return Math.max(1, Math.round(adjusted / 10) * 10);
 }

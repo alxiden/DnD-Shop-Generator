@@ -68,7 +68,8 @@ export class ShopGeneratorForm extends FormApplication {
       typeOptions: ["general", "blacksmith", "alchemy", "arcane"],
       sourcePacks: game.settings.get(MODULE_ID, "sourcePacks"),
       includeWorldItems: game.settings.get(MODULE_ID, "includeWorldItems"),
-      includeMagicItems: game.settings.get(MODULE_ID, "includeMagicItems")
+      includeMagicItems: game.settings.get(MODULE_ID, "includeMagicItems"),
+      itemCount: ""
     };
   }
 
@@ -81,13 +82,17 @@ export class ShopGeneratorForm extends FormApplication {
     await game.settings.set(MODULE_ID, "includeWorldItems", includeWorldItems);
     await game.settings.set(MODULE_ID, "includeMagicItems", includeMagicItems);
 
+    const rawCount = parseInt(formData.itemCount, 10);
+    const itemCount = Number.isFinite(rawCount) && rawCount > 0 ? Math.min(rawCount, 100) : null;
+
     const config = {
       shopType: formData.shopType,
       settlement: formData.settlement,
       quality: formData.quality,
       sourcePackIds: csvToPackIds(sourcePacks),
       includeWorldItems,
-      includeMagicItems
+      includeMagicItems,
+      itemCount
     };
 
     if (!config.sourcePackIds.length && !config.includeWorldItems) {

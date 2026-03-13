@@ -150,7 +150,8 @@ export function buildShopName(shopType, quality) {
 
 export async function generateShop(config) {
   const baseStock = STOCK_SIZES[config.settlement] ?? 12;
-  const stockTarget = Math.max(5, Math.floor(baseStock * (QUALITY_STOCK_MULTIPLIER[config.quality] ?? 1.0)));
+  const autoTarget = Math.max(5, Math.floor(baseStock * (QUALITY_STOCK_MULTIPLIER[config.quality] ?? 1.0)));
+  const stockTarget = config.itemCount ?? autoTarget;
 
   const pool = await getItemPool(config);
   if (!pool.length) {
