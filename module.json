@@ -3,14 +3,16 @@
 	"title": "D&D Shop Generator",
 	"description": "Generate D&D 5e shops with themed inventory, pricing modifiers, and journal output.",
 	"version": "0.1.0",
+	"manifest": "",
+	"download": "",
 	"authors": [
 		{
 			"name": "alxiden"
 		}
 	],
 	"compatibility": {
-		"minimum": "12",
-		"verified": "12"
+		"minimum": "13",
+		"verified": "13"
 	},
 	"esmodules": [
 		"scripts/main.js"

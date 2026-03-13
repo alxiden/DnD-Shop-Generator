@@ -19,6 +19,15 @@ Hooks.once("init", () => {
     default: false
   });
 
+  game.settings.register(MODULE_ID, "includeMagicItems", {
+    name: "Include Magic Items",
+    hint: "Allow magic items in generated stock. Disable for mundane-only shops.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
   game.settings.registerMenu(MODULE_ID, "openGenerator", {
     name: "Open Shop Generator",
     label: "Open",

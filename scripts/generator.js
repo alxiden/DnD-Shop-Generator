@@ -1,10 +1,18 @@
 import { applyPriceModifiers, cpToPrice, formatPrice, priceToCp } from "./pricing.js";
 
 const SHOP_ITEM_TYPES = {
-  general: ["equipment", "consumable", "tool", "loot", "backpack"],
-  blacksmith: ["weapon", "equipment", "tool"],
-  alchemy: ["consumable", "tool", "loot"],
-  arcane: ["consumable", "tool", "equipment", "loot"]
+  general:      ["equipment", "consumable", "tool", "loot", "backpack"],
+  blacksmith:   ["weapon", "equipment", "tool"],
+  alchemy:      ["consumable", "tool", "loot"],
+  arcane:       ["consumable", "tool", "equipment", "loot"],
+  fletcher:     ["weapon", "consumable", "tool"],
+  jeweler:      ["loot", "equipment"],
+  herbalist:    ["consumable", "tool"],
+  tavern:       ["consumable", "loot"],
+  stables:      ["equipment", "consumable", "tool"],
+  leatherworker:["equipment", "tool"],
+  bookshop:     ["consumable", "tool", "loot"],
+  curiosity:    ["loot", "consumable", "equipment", "tool", "backpack"]
 };
 
 const STOCK_SIZES = {
@@ -32,6 +40,21 @@ const RARITY_WEIGHT = {
 
 function normalizeRarity(item) {
   return String(item?.system?.rarity ?? "common").toLowerCase();
+}
+
+function hasMagicProperty(item) {
+  const props = item?.system?.properties;
+  if (!props) return false;
+  if (Array.isArray(props)) return props.includes("mgc");
+  if (props instanceof Set) return props.has("mgc");
+  if (typeof props === "object") return Boolean(props.mgc);
+  return false;
+}
+
+function isMagicItem(item) {
+  const rarity = normalizeRarity(item);
+  const magicRarities = ["uncommon", "rare", "very rare", "legendary", "artifact"];
+  return hasMagicProperty(item) || magicRarities.includes(rarity);
 }
 
 function baseWeight(item, quality) {
@@ -70,7 +93,7 @@ async function loadItemsFromPack(packId) {
   return docs.filter((item) => !item.system?.source?.custom);
 }
 
-export async function getItemPool({ shopType, sourcePackIds, includeWorldItems }) {
+export async function getItemPool({ shopType, sourcePackIds, includeWorldItems, includeMagicItems }) {
   const validTypes = SHOP_ITEM_TYPES[shopType] ?? SHOP_ITEM_TYPES.general;
   const pool = [];
 
@@ -86,6 +109,7 @@ export async function getItemPool({ shopType, sourcePackIds, includeWorldItems }
   const deduped = new Map();
   for (const item of pool) {
     if (!validTypes.includes(item.type)) continue;
+    if (!includeMagicItems && isMagicItem(item)) continue;
     if (item.system?.quantity === 0) continue;
     if (!deduped.has(item.uuid)) deduped.set(item.uuid, item);
   }
@@ -96,10 +120,18 @@ export async function getItemPool({ shopType, sourcePackIds, includeWorldItems }
 export function buildShopName(shopType, quality) {
   const prefixes = ["Iron", "Silver", "Cinder", "Gilded", "Wayfarer", "Moon", "Oak", "Copper"];
   const suffixByType = {
-    general: ["Bazaar", "Outfitter", "Supply", "Emporium"],
-    blacksmith: ["Forge", "Anvil", "Hammerworks", "Smithy"],
-    alchemy: ["Elixirs", "Still", "Phials", "Retort"],
-    arcane: ["Sigils", "Curios", "Arcana", "Esoterica"]
+    general:       ["Bazaar", "Outfitter", "Supply", "Emporium"],
+    blacksmith:    ["Forge", "Anvil", "Hammerworks", "Smithy"],
+    alchemy:       ["Elixirs", "Still", "Phials", "Retort"],
+    arcane:        ["Sigils", "Curios", "Arcana", "Esoterica"],
+    fletcher:      ["Quivers", "Bowyer", "Arrowsmith", "Stave"],
+    jeweler:       ["Gems", "Jewels", "Facets", "Brilliance"],
+    herbalist:     ["Roots", "Garden", "Herbary", "Canopy"],
+    tavern:        ["Flagon", "Hearth", "Table", "Cellar"],
+    stables:       ["Stables", "Paddock", "Tack", "Farrier"],
+    leatherworker: ["Hides", "Tannery", "Stitchworks", "Leathers"],
+    bookshop:      ["Scrolls", "Volumes", "Pages", "Codex"],
+    curiosity:     ["Oddities", "Relics", "Trinkets", "Wonders"]
   };
 
   const qualityFlavor = {
