@@ -1,0 +1,50 @@
+<form class="shop-generator-form" autocomplete="off">
+  <div class="form-group">
+    <label>Shop Type</label>
+    <select name="shopType" required>
+      <option value="general" selected>general</option>
+      <option value="blacksmith">blacksmith</option>
+      <option value="alchemy">alchemy</option>
+      <option value="arcane">arcane</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Settlement</label>
+    <select name="settlement" required>
+      <option value="hamlet">hamlet</option>
+      <option value="village">village</option>
+      <option value="town" selected>town</option>
+      <option value="city">city</option>
+      <option value="metropolis">metropolis</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Quality</label>
+    <select name="quality" required>
+      <option value="poor">poor</option>
+      <option value="standard" selected>standard</option>
+      <option value="luxury">luxury</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Source Packs (CSV)</label>
+    <input type="text" name="sourcePacks" value="{{sourcePacks}}" placeholder="dnd5e.items,world.magic-items" />
+    <p class="notes">Use compendium IDs separated by commas.</p>
+  </div>
+
+  <div class="form-group">
+    <label class="checkbox">
+      <input type="checkbox" name="includeWorldItems" {{#if includeWorldItems}}checked{{/if}} />
+      Include world items
+    </label>
+  </div>
+
+  <footer class="sheet-footer flexrow">
+    <button type="submit" name="submit">
+      <i class="fas fa-wand-magic-sparkles"></i> Generate Shop
+    </button>
+  </footer>
+</form>

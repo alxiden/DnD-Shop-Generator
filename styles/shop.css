@@ -1,0 +1,46 @@
+.dnd-shop-generator-open {
+  margin-left: 0.25rem;
+}
+
+.dnd-shop-generator .shop-generator-form .form-group {
+  margin-bottom: 0.6rem;
+}
+
+.dnd-shop-generator .shop-generator-form .notes {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.dnd-shop-generator .shop-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.dnd-shop-generator .shop-header h2 {
+  margin-bottom: 0.3rem;
+}
+
+.dnd-shop-generator .shop-table-wrap {
+  max-height: 470px;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+.dnd-shop-generator .shop-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dnd-shop-generator .shop-table th,
+.dnd-shop-generator .shop-table td {
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dnd-shop-generator .shop-actions {
+  display: flex;
+  justify-content: flex-end;
+}
