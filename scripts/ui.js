@@ -66,6 +66,7 @@ export class ShopGeneratorForm extends FormApplication {
       settlementOptions: ["hamlet", "village", "town", "city", "metropolis"],
       qualityOptions: ["poor", "standard", "luxury"],
       typeOptions: ["general", "blacksmith", "alchemy", "arcane"],
+      shopName: "",
       sourcePacks: game.settings.get(MODULE_ID, "sourcePacks"),
       includeWorldItems: game.settings.get(MODULE_ID, "includeWorldItems"),
       includeMagicItems: game.settings.get(MODULE_ID, "includeMagicItems"),
@@ -77,6 +78,7 @@ export class ShopGeneratorForm extends FormApplication {
     const sourcePacks = String(formData.sourcePacks ?? "");
     const includeWorldItems = Boolean(formData.includeWorldItems);
     const includeMagicItems = Boolean(formData.includeMagicItems);
+    const shopName = String(formData.shopName ?? "").trim();
 
     await game.settings.set(MODULE_ID, "sourcePacks", sourcePacks);
     await game.settings.set(MODULE_ID, "includeWorldItems", includeWorldItems);
@@ -86,6 +88,7 @@ export class ShopGeneratorForm extends FormApplication {
     const itemCount = Number.isFinite(rawCount) && rawCount > 0 ? Math.min(rawCount, 100) : null;
 
     const config = {
+      shopName: shopName || null,
       shopType: formData.shopType,
       settlement: formData.settlement,
       quality: formData.quality,

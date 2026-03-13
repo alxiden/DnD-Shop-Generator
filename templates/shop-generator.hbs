@@ -40,6 +40,12 @@
   </div>
 
   <div class="form-group">
+    <label>Shop Name (Optional)</label>
+    <input type="text" name="shopName" value="{{shopName}}" placeholder="Leave blank to auto-generate" />
+    <p class="notes">If left blank, a random name is generated.</p>
+  </div>
+
+  <div class="form-group">
     <label>Item Count</label>
     <input type="number" name="itemCount" value="{{itemCount}}" min="1" max="100" placeholder="Auto" />
     <p class="notes">Leave blank to use the settlement size default.</p>

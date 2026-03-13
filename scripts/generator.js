@@ -255,7 +255,7 @@ export async function generateShop(config) {
   const sorted = chosen.sort((a, b) => a.finalCp - b.finalCp);
 
   return {
-    name: buildShopName(config.shopType, config.quality),
+    name: config.shopName || buildShopName(config.shopType, config.quality),
     shopType: config.shopType,
     settlement: config.settlement,
     quality: config.quality,
