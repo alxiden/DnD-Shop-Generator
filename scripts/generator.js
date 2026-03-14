@@ -126,6 +126,35 @@ function baseWeight(item, quality) {
   return rarityWeight;
 }
 
+function rollStockQuantity(item) {
+  const rarity = normalizeRarity(item);
+  const type = item.type;
+
+  const baseByType = {
+    consumable: [6, 20],
+    loot: [2, 10],
+    equipment: [1, 8],
+    tool: [1, 6],
+    backpack: [1, 5],
+    weapon: [1, 4]
+  };
+
+  const [minBase, maxBase] = baseByType[type] ?? [1, 6];
+  const raw = Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
+
+  const rarityMultiplier = {
+    common: 1.0,
+    uncommon: 0.65,
+    rare: 0.4,
+    "very rare": 0.25,
+    legendary: 0.1,
+    artifact: 0.1
+  };
+
+  const scaled = Math.round(raw * (rarityMultiplier[rarity] ?? 1.0));
+  return Math.max(1, scaled);
+}
+
 function weightedPick(items) {
   const total = items.reduce((sum, item) => sum + item.weight, 0);
   let roll = Math.random() * total;
@@ -153,6 +182,15 @@ function matchesShopKeywords(item, shopType) {
   return keywords.some((kw) => name.includes(kw));
 }
 
+function itemUniqueKey(item) {
+  const normalizedName = String(item.name ?? "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+  return `${item.type}:${normalizedName}`;
+}
+
 export async function getItemPool({ shopType, sourcePackIds, includeWorldItems, includeMagicItems }) {
   const validTypes = SHOP_ITEM_TYPES[shopType] ?? SHOP_ITEM_TYPES.general;
   const pool = [];
@@ -172,7 +210,9 @@ export async function getItemPool({ shopType, sourcePackIds, includeWorldItems, 
     if (!matchesShopKeywords(item, shopType)) continue;
     if (!includeMagicItems && isMagicItem(item)) continue;
     if (item.system?.quantity === 0) continue;
-    if (!deduped.has(item.uuid)) deduped.set(item.uuid, item);
+
+    const key = itemUniqueKey(item);
+    if (!deduped.has(key)) deduped.set(key, item);
   }
 
   return Array.from(deduped.values());
@@ -227,13 +267,14 @@ export async function generateShop(config) {
   }));
 
   const chosen = [];
-  const usedUuids = new Set();
+  const usedKeys = new Set();
 
-  while (chosen.length < stockTarget && usedUuids.size < weightedPool.length) {
+  while (chosen.length < stockTarget && usedKeys.size < weightedPool.length) {
     const pick = weightedPick(weightedPool);
-    if (usedUuids.has(pick.item.uuid)) continue;
+    const key = itemUniqueKey(pick.item);
+    if (usedKeys.has(key)) continue;
 
-    usedUuids.add(pick.item.uuid);
+    usedKeys.add(key);
 
     const baseCp = priceToCp(pick.item);
     const finalCp = applyPriceModifiers(baseCp || 100, config);
@@ -244,6 +285,7 @@ export async function generateShop(config) {
       uuid: pick.item.uuid,
       name: pick.item.name,
       type: pick.item.type,
+      stock: rollStockQuantity(pick.item),
       rarity: normalizeRarity(pick.item),
       baseCp,
       finalCp,

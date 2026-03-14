@@ -15,6 +15,7 @@ function inventoryToHtmlRows(inventory) {
       (item) => `<tr>
         <td>${item.name}</td>
         <td>${item.type}</td>
+        <td>${item.stock}</td>
         <td>${item.rarity}</td>
         <td>${item.displayPrice}</td>
       </tr>`
@@ -29,7 +30,7 @@ async function createJournalFromShop(shopData) {
     <p><strong>Type:</strong> ${shopData.shopType} | <strong>Settlement:</strong> ${shopData.settlement} | <strong>Quality:</strong> ${shopData.quality}</p>
     <table>
       <thead>
-        <tr><th>Item</th><th>Type</th><th>Rarity</th><th>Price</th></tr>
+        <tr><th>Item</th><th>Type</th><th>Stock</th><th>Rarity</th><th>Price</th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
